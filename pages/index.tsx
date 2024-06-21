@@ -1,53 +1,45 @@
-import Head from "next/head";
-import { useSession, useSupabaseClient } from "@supabase/auth-helpers-react";
-import { Auth, ThemeSupa } from "@supabase/auth-ui-react";
-import Game from "@/components/Game";
-import Leaderboard from "@/components/Leaderboard";
-import { useState, useEffect } from "react";
-import EliizaLogo from "@/public/eliiza.svg";
-import Image from "next/image";
-import { useSmallScreen } from "@/utils/useSmallScreen";
-import { attemptsAllowed } from "@/utils/attempts";
+import Head from 'next/head'
+import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Auth, ThemeSupa } from '@supabase/auth-ui-react'
+import Game from '@/components/Game'
+import Leaderboard from '@/components/Leaderboard'
+import { useState, useEffect } from 'react'
+
+import Image from 'next/image'
+import { useSmallScreen } from '@/utils/useSmallScreen'
+import { attemptsAllowed } from '@/utils/attempts'
 
 export default function Home() {
-  const session = useSession();
-  const supabase = useSupabaseClient();
-  const [username, setUsername] = useState("");
+  const session = useSession()
+  const supabase = useSupabaseClient()
+  const [username, setUsername] = useState('')
 
   const getOrCreateUsername = async (session: any) => {
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id);
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', session.user.id)
     if (error) {
-      console.log(error);
-      return;
+      console.log(error)
+      return
     }
-    let username = "";
+    let username = ''
     if (data.length == 0) {
-      username =
-        (await supabase.auth.getUser()).data.user?.email ||
-        "email.not.found@anywhere.com";
-      await supabase
-        .from("profiles")
-        .insert({ id: session.user.id, username })
-        .eq("id", session.user.id);
+      username = (await supabase.auth.getUser()).data.user?.email || 'email.not.found@anywhere.com'
+      await supabase.from('profiles').insert({ id: session.user.id, username }).eq('id', session.user.id)
     } else {
-      username = data[0].username;
+      username = data[0].username
     }
-    setUsername(username);
-  };
+    setUsername(username)
+  }
 
   useEffect(
     function onChange() {
       if (session) {
-        getOrCreateUsername(session);
+        getOrCreateUsername(session)
       }
     },
     [session]
-  );
+  )
 
-  const isSmallScreen = useSmallScreen();
+  const isSmallScreen = useSmallScreen()
 
   return (
     <>
@@ -60,14 +52,7 @@ export default function Home() {
       <div className="flex justify-center w-full h-screen">
         <div className="w-full max-w-5xl h-screen bg-white flex flex-col p-5">
           <nav className="flex h-14 flex-row items-center justify-between">
-            <p className="font-sans text-3xl whitespace-nowrap">
-              <Image
-                src={EliizaLogo}
-                alt="Eliiza logo"
-                className="w-10 inline-block"
-              />
-              {isSmallScreen ? "" : "Prompt Injection Game"}
-            </p>
+            <p className="font-sans text-3xl whitespace-nowrap">{isSmallScreen ? '' : 'Prompt Injection Game'}</p>
             {session ? (
               <div className="flex">
                 <p className="text-right">{username}</p>
@@ -76,9 +61,8 @@ export default function Home() {
                     href="#"
                     className="text-sm text-gray-600 no-underline dark:text-gray-500 hover:no-underline"
                     onClick={async () => {
-                      const { error } = await supabase.auth.signOut();
-                      if (error)
-                        console.log("Error logging out:", error.message);
+                      const { error } = await supabase.auth.signOut()
+                      if (error) console.log('Error logging out:', error.message)
                     }}
                   >
                     logout
@@ -97,8 +81,7 @@ export default function Home() {
                         Prompt Injection Game
                       </h1>
                       <span className="font-sans text-sm text-center pb-2 mb-1 border-b mx-4 align-center">
-                        {attemptsAllowed} attempts, 3 levels. Trick the AI model
-                        to give you the secret code to pass.
+                        {attemptsAllowed} attempts, 3 levels. Trick the AI model to give you the secret code to pass.
                       </span>
 
                       <Auth
@@ -108,16 +91,16 @@ export default function Home() {
                           variables: {
                             default: {
                               colors: {
-                                brand: "black",
-                                brandAccent: "black",
-                                defaultButtonBackground: "#000",
-                                defaultButtonBackgroundHover: "#000",
+                                brand: 'black',
+                                brandAccent: 'black',
+                                defaultButtonBackground: '#000',
+                                defaultButtonBackgroundHover: '#000',
                               },
                             },
                           },
                         }}
                         theme="default"
-                        providers={["google"]}
+                        providers={['google']}
                         onlyThirdPartyProviders={true}
                       />
                     </div>
@@ -130,27 +113,15 @@ export default function Home() {
                     <div className="text-left">
                       <p>
                         <span className="pr-2">&copy;</span>
-                        <a
-                          href="https://github.com/woop"
-                          target="_blank"
-                          className="hover:underline"
-                        >
+                        <a href="https://github.com/woop" target="_blank" className="hover:underline">
                           Willem Pienar
                         </a>
                         ,
-                        <a
-                          href="https://github.com/shrumm"
-                          target="_blank"
-                          className="hover:underline"
-                        >
+                        <a href="https://github.com/shrumm" target="_blank" className="hover:underline">
                           Shahram Anver
                         </a>
                         ,
-                        <a
-                          href="https://github.com/zhilingc"
-                          target="_blank"
-                          className="hover:underline"
-                        >
+                        <a href="https://github.com/zhilingc" target="_blank" className="hover:underline">
                           Chen Zhiling
                         </a>
                       </p>
@@ -166,5 +137,5 @@ export default function Home() {
         </div>
       </div>
     </>
-  );
+  )
 }
